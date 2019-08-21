@@ -19,9 +19,25 @@ use Faker\Generator as Faker;
 $factory->define(User::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
+        'ph_no' => $faker->phoneNumber,
         'email' => $faker->unique()->safeEmail,
-        'email_verified_at' => now(),
+        'address' => $faker->sentence,
+        'profile-img' => 'http://via.placeholder.com/150x150',
+        'cover-img' => 'http://via.placeholder.com/150x150',
         'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
         'remember_token' => Str::random(10),
+    ];
+});
+
+$factory->define(App\Message::class, function (Faker $faker) {
+    do {
+        $from = rand(1,15);
+        $to = rand(1,15);
+    }while ($from === $to);
+
+    return [
+        'from' => $from,
+        'to' => $to,
+        'text' => $faker->sentence,
     ];
 });
