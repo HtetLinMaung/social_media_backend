@@ -30,3 +30,7 @@ Route::group([
         Route::get('user', 'AuthController@user');
     });
 });
+    Route::group(['prefix' => 'v1'], function () {
+    Route::apiResource('/posts', 'PostsController');
+   
+    });
