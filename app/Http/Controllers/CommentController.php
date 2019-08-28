@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Comment;
 use App\Http\Resources\Comment as CommentResource;
-use App\Http\Requests;
 
 class CommentController extends Controller
 {
@@ -16,13 +15,9 @@ class CommentController extends Controller
      */
     public function index()
     {
-        //Get all Comment
-        $comment = Comment::all();
-
-        //Return collection of comment as resource
-        return CommentResource::collection($comment);
-    }   
-
+        //
+        return CommentResource::collection(Comment::all());
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -43,13 +38,11 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         //
-        $comment = $request->isMethod('put') ? Comment::findOrFail($request->comment_id) : new Comment;
-
-        $comment->id = $request->input('comment_id');
+        $comment = new Comment;
         $comment->description = $request->input('description');
-        $comment->user_id = $request->input('user_id');
-
-        if ($comment->save()) {
+        $comment->post_id = $request->input('post_id');
+        $comment->user_id = $request->user()->id;
+        if($comment->save()) {
             return new CommentResource($comment);
         }
     }
@@ -65,7 +58,6 @@ class CommentController extends Controller
         //
         $comment = Comment::findOrFail($id);
 
-        //Return single comment for edit
         return new CommentResource($comment);
     }
 
@@ -87,9 +79,14 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Comment $comment)
     {
         //
+        if($request->user()->id !== $comment->user_id) {
+            return response()->json(['error' => 'You can only edit your Comments']);
+        }
+        $comment->update($request->only(['description']));
+        return new CommentResource($comment);
     }
 
     /**
@@ -103,9 +100,8 @@ class CommentController extends Controller
         //
         $comment = Comment::findOrFail($id);
 
-        if ($comment->delete()) {
-             return new CommentResource($comment);
+        if($comment->delete()) {
+            return new CommentResource($comment);
         }
-       
     }
 }

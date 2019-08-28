@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request; 
-
+use Illuminate\Http\Request;
 use App\InnerComment;
 use App\Http\Resources\InnerComment as InnerCommentResource;
-use App\Http\Requests;
 
 class InnerCommentController extends Controller
 {
@@ -17,9 +15,8 @@ class InnerCommentController extends Controller
      */
     public function index()
     {
-        $innerComment = InnerComment::all();
-
-        return InnerCommentResource::collection($innerComment);
+        //
+        return InnerCommentResource::collection(InnerComment::all());
     }
 
     /**
@@ -40,16 +37,14 @@ class InnerCommentController extends Controller
      */
     public function store(Request $request)
     {
-        $inner_comment = $request->isMethod('put') ? InnerComment::findOrFail($request->inner_comment_id) : new InnerComment;
-
-        $inner_comment->id = $request->input('inner_comment_id');
+        //
+        $inner_comment = new InnerComment;
         $inner_comment->description = $request->input('description');
-        $inner_comment->user_id = $request->input('comment_id');
-        $inner_comment->user_id = $request->input('user_id');
-
-        if ($comment->save()) {
-            return new CommentResource($inner_comment);
-        }
+        $inner_comment->user_id = $request->user()->id;
+        $inner_comment->comment_id = $request->input('comment_id');
+         if($inner_comment->save()){
+        return new InnerCommentResource($inner_comment);
+        };
     }
 
     /**
@@ -60,9 +55,10 @@ class InnerCommentController extends Controller
      */
     public function show($id)
     {
-        $innerComment = InnerComment::FindOrFail($id);
+        //
+        $inner_comment = InnerComment::findOrFail($id);
 
-        return new InnerCommentResource($innerComment);
+        return new InnerCommentResource($inner_comment); 
     }
 
     /**
@@ -83,9 +79,15 @@ class InnerCommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request,InnnerComment $inner_comment)
     {
         //
+        if($request->user()->id !== $inner_comment->user_id) {
+            return response()->json(['error' => 'You can only edit your comments']);
+        }
+        $inner_comment->update($request->only(['description']));
+
+        return new InnerCommentResource($inner_comment);
     }
 
     /**
@@ -96,10 +98,10 @@ class InnerCommentController extends Controller
      */
     public function destroy($id)
     {
-        $innerComment = InnerComment::FindOrFail($id);
-
-        if($innerComment->delete()) {
-            return new InnerCommentResource($id);
+        //
+        $inner_comment = InnerComment::findOrFail($id);
+        if($inner_comment->delete()) {
+            return new InnerCommentResource($inner_comment);
         }
     }
 }

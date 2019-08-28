@@ -17,20 +17,22 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-<<<<<<< HEAD
-Route::get('comment', 'CommentController@index');
+
+/*Route::get('comment', 'CommentController@index');
 
 Route::get('comment/{id}', 'CommentController@show');
 
 Route::post('comment', 'CommentController@store');
 
-Route::put('comment', 'CommentController@store');
+Route::put('comment', 'CommentController@store');*/
 
-Route::delete('comment/{id}', 'CommentController@destroy');
+// Route::delete('comment/{id}', 'CommentController@destroy');
 
-Route::apiResource('innerComment', 'InnerCommentController');
+Route::apiResources([
+    'comment' => 'CommentController',
+    'innerComment' => 'InnerCommentController']);
 
-=======
+
 Route::group([
     'prefix' => 'auth'
 ], function () {
@@ -48,4 +50,4 @@ Route::group([
     Route::apiResource('/posts', 'PostsController');
    
     });
->>>>>>> 5da29ad980c467993e239d3e06c8cf6012a8232b
+
